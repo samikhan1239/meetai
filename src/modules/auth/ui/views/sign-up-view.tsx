@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import {Alert ,AlertTitle } from "@/components/ui/alert";
 import { OctagonAlertIcon } from "lucide-react";
 import Link from "next/link";
+import{FaGithub, FaGoogle} from "react-icons/fa";
 import {authClient} from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -26,6 +27,7 @@ path:["confirmPassword"],
 
 })
 export default function SignUpView() {
+
 
   const router =useRouter();
   const [pending, setPending] = useState(false);
@@ -162,17 +164,28 @@ export default function SignUpView() {
 <div className="grid grid-cols-2 gap-4">
   <Button
   disabled={pending}
+  onClick={() =>{
+    authClient.signIn.social({
+      provider:"google",
+      callbackURL:"/",
+    })
+   }}
     variant="outline"
     className="w-full"
     type="button">
-    Google
+  <FaGoogle/>
   </Button>
    <Button
    disabled={pending}
+   onClick={() =>{
+       authClient.signIn.social({
+         provider:"github",
+       })
+      }}
     variant="outline"
     className="w-full"
     type="button">
-    Github
+<FaGithub/>
   </Button>
 </div>
 <div className="text-center text-sm">
