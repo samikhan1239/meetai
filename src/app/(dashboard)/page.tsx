@@ -5,14 +5,8 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 const Page = async () => {
-  const data = await caller.hello({text : "Antonio Server"})
-  const session= await auth.api.getSession({
-    headers:await headers(),
-     });
-    if(!session) {
-      redirect ("/sign-in");
-    }
-    return <p>{data.greeting}</p>
+
+ 
  
   return ( <HomeView/> );
 }

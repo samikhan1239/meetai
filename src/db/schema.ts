@@ -1,3 +1,4 @@
+import {nanoid} from "nanoid";
 import { escapeIdentifier } from "@neondatabase/serverless";
 import { te } from "date-fns/locale";
 import { pgTable , text, timestamp, boolean } from "drizzle-orm/pg-core";
@@ -47,4 +48,21 @@ identifier: text('identifier').notNull(),
   expiresAt: timestamp('expires_at').notNull(),
   createdAt: timestamp('created_at').$defaultFn(() => /* @_PURE__ */ new Date()),
   updatedAt: timestamp('updated_at').$defaultFn(() => /* @_PURE__ */ new Date()),
+});
+
+
+
+export const agents =pgTable("agents" ,{
+    id: text("id")
+    .primaryKey()
+    .$defaultFn(() => nanoid()),
+    name:text("name").notNull(),
+    userId: text("user_id")
+    .notNull()
+    .references(() => user.id , {onDelete: "cascade"}),
+    instructions: text("instructions").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+
+
 });
