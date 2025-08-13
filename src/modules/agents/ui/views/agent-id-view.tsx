@@ -2,29 +2,57 @@
 import { ErrorState } from "@/components/error-state";
 import { LoadingState } from "@/components/loading-state";
 import { useTRPC } from "@/trpc/client";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { AgentIdViewHeader } from "../components/agent-id-view-header";
 import { GeneratedAvatar } from "@/components/generated-avatar";
 import { Badge } from "@/components/ui/badge";
 import { VideoIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
 
 interface Props {
     agentId : string;
 };
 
 export const AgentIdView = ({ agentId }: { agentId: string }) => {
+    const router = useRouter();
+    const queryClient = useQueryClient();
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(
     trpc.agents.getOne.queryOptions({ id: agentId })
   );
 
+  const removeAgent = useMutation(
+    trpc.agents.remove.mutationOptions({
+        onSuccess: async () =>{
+           await queryClient.invalidateQueries(trpc.agents.getMany.queryOptions({}));
+
+           router.push("/agents")
+            
+        },
+        onError: (error) => {
+          toast.error(error.message)
+        }
+
+    })
+  );
+
+
+
+
+
+
+
   return (
+    <>
+  
     <div className="flex-1 py-4 px-4 md:px-8 flex flex-col gap-y-4">
     <AgentIdViewHeader 
     agentId={agentId}
     agentName={data.name}
     onEdit={() => {}}
-    onRemove={() => {}}
+    onRemove={() => removeAgent.mutate({ id: agentId })}
 
     />
     <div className ="bg-white rounded-lg border">
@@ -55,6 +83,7 @@ export const AgentIdView = ({ agentId }: { agentId: string }) => {
          
     </div>
     </div>
+    </>
   );
 };
 
