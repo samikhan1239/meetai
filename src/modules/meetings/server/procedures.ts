@@ -7,6 +7,7 @@ import z from "zod";
 import { and, count, desc, eq, getTableColumns, ilike, sql } from "drizzle-orm";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE, MIN_PAGE_SIZE } from "@/constants";
 import { meetingsInsertSchema, meetingsUpdateSchema } from "../schema";
+import { MeetingStatus } from "../type";
 
 export const meetingsRouter = createTRPCRouter({
 
@@ -85,11 +86,22 @@ getMany: protectedProcedure
     .min(MIN_PAGE_SIZE)
     .max(MAX_PAGE_SIZE)
     .default(DEFAULT_PAGE_SIZE),
-    search: z.string().nullish()
+    search: z.string().nullish(),
+    agentId: z.string().nullish(),
+    status:z.enum([
+        MeetingStatus.Upcoming,
+        MeetingStatus.Active,
+        MeetingStatus.Completed,    
+        MeetingStatus.Processing,
+        MeetingStatus.Cancelled,
+
+
+    ])
+    .nullish(),
 })
 )
 .query(async ({ctx, input }) => {
-    const {search , page, pageSize} = input;
+    const {search , page, pageSize, status, agentId} = input;
         const data = await db
         .select({
             
@@ -104,6 +116,9 @@ getMany: protectedProcedure
             and(
                 eq(meetings.userId, ctx.auth.user.id),
                search ? ilike(meetings.name , `%${input.search}%`) : undefined,
+               status ? eq(meetings.status, status) : undefined,
+                agentId ? eq(meetings.agentId, agentId) : undefined,
+
             )
         )
         .orderBy(desc(meetings.createdAt), desc(meetings.id))
@@ -116,8 +131,10 @@ getMany: protectedProcedure
         .from(meetings)
         .where(
             and(
-              eq(meetings.userId , ctx.auth.user.id),
-                search ? ilike(meetings.name,`%${search}%`): undefined,
+              eq(meetings.userId, ctx.auth.user.id),
+               search ? ilike(meetings.name , `%${input.search}%`) : undefined,
+               status ? eq(meetings.status, status) : undefined,
+                agentId ? eq(meetings.agentId, agentId) : undefined,
             )
 
         );
