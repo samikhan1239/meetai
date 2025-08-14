@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import {  meetings } from "@/db/schema";
+import {  agents, meetings } from "@/db/schema";
 import {createTRPCRouter, baseProcedure, protectedProcedure} from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
 
@@ -92,11 +92,14 @@ getMany: protectedProcedure
     const {search , page, pageSize} = input;
         const data = await db
         .select({
-            meetingCount: sql<number>`5`,
+            
             ...getTableColumns(meetings),
+            agent:agents,
+            duration: sql<number>`EXTRACT(EPOCH FROM (ended_at - started_at))`.as("duration"),  
           
         })
         .from(meetings)
+        .innerJoin(agents, eq(meetings.agentId, agents.id))
         .where(
             and(
                 eq(meetings.userId, ctx.auth.user.id),
