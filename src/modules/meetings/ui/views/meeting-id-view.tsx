@@ -6,6 +6,11 @@ import { useTRPC } from "@/trpc/client";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { MeetingIdViewHeader } from "../components/meeting-id-view-header";
 import { useRouter } from "next/navigation";
+import { UpcomingState } from "../components/upcoming-state";
+import { ActiveState } from "../components/active-state";
+import { Cancel } from "@radix-ui/react-alert-dialog";
+import { CancelledState } from "../components/cancelled-state";
+import { ProcessingState } from "../components/processing-state";
 
 interface Props{
     meetingId: string;
@@ -37,6 +42,14 @@ export const MeetingIdView = ({meetingId} : Props) => {
 
     )
 
+    const isActive = data.status ==="active";
+    const isUpcoming = data.status ==="upcoming";
+    const isCancelled = data.status ==="cancelled";
+    const isCompleted = data.status ==="completed";
+    const isProcessing = data.status ==="processing";
+   
+
+
 return(
     <>
     
@@ -52,7 +65,17 @@ return(
         
         
         />
-       {JSON.stringify(data, null, 2)}
+      {isCancelled && <CancelledState/>}
+      {isProcessing && <ProcessingState/>}
+      {isCompleted && <div> Completed</div>}
+      {isUpcoming && <UpcomingState
+      meetingId={meetingId}
+      onCancelMeeting={() => {}}
+      isCancelling={false}
+      />}
+      {isActive && <ActiveState meetingId={meetingId} />}
+
+   
 
     </div>
     
