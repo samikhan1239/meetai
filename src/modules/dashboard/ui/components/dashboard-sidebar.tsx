@@ -19,6 +19,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DashboardUserButton } from "./dashboard-user-button";
+import { DashboardTrial } from "./dashboard-trial";
 
 const firstSection = [
   {
@@ -111,6 +112,9 @@ pathname === item.href && "bg-linear-to-r/oklch border-[#5D6B68]/10"
       </SidebarContent>
 
       <SidebarFooter className="text-white">
+
+<DashboardTrial/>
+
     <DashboardUserButton />
       </SidebarFooter>
     </Sidebar>

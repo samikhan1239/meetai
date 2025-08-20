@@ -60,7 +60,7 @@ export const DashboardUserButton =() =>{
                     <DrawerFooter>
                         <Button
                         variant="outline"
-                        onClick={()=>{}}>
+                        onClick={()=> authClient.customer.portal()}>
                             <CreditCardIcon  className="size-4 text-black"/>
 Billing
                         </Button>
