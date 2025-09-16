@@ -134,7 +134,7 @@ export default function SignUpView() {
             name="confirmPassword"
             render={({field}) => (
               <FormItem>
-                <FormLabel> Connfirm Password</FormLabel>
+                <FormLabel> Confirm Password</FormLabel>
                 <FormControl>
                   <Input  type ="password" placeholder="******" {...field} />
                 </FormControl>
