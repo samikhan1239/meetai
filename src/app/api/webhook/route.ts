@@ -19,6 +19,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 import OpenAI from "openai";
 import {ChatCompletionMessageParam} from "openai/resources/index.mjs"
+import { GoogleGenerativeAI } from "@google/generative-ai";
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const geminiModel = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
 
 const openaiClient = new OpenAI({apiKey: process.env.OPENNAI_API_KEY!});
@@ -263,15 +266,70 @@ await inngest.send({
         content: message.text || "",
       }));
 
-      const GPTResponse = await openaiClient.chat.completions.create({
-        messages:[
-            {role: "system" , content: instructions},
-            ...previousMessages,
-            {role:"user" , content: text},
-        ],
-        model: "gpt-4o",
-      });
-      const GPTResponseText = GPTResponse.choices[0].message.content;
+     // Build Gemini input
+const geminiPrompt =
+  instructions +
+  "\n\nRecent conversation:\n" +
+  previousMessages
+    .map((msg) => `${msg.role}: ${msg.content}`)
+    .join("\n") +
+  `\n\nUser: ${text}`;
+
+console.log("📤 Sending to Gemini:", geminiPrompt);
+
+// Get text response from Gemini
+const geminiResult = await geminiModel.generateContent(geminiPrompt);
+
+console.log("📥 Gemini raw result:", geminiResult);
+
+const GPTResponseText = geminiResult.response.text();
+console.log("✅ Gemini final text:", GPTResponseText);
+
+if (!GPTResponseText) {
+  console.error("❌ Gemini returned empty text");
+  return NextResponse.json(
+    { error: "No response from Gemini" },
+    { status: 400 }
+  );
+}
+
+// Convert Gemini's text into voice with OpenAI TTS
+const speech = await openaiClient.audio.speech.create({
+  model: "gpt-4o-mini-tts",
+  voice: "alloy", // change to another voice if you want
+  input: GPTResponseText,
+});
+
+// Convert audio response into a Buffer
+const audioBuffer = Buffer.from(await speech.arrayBuffer());
+console.log("🎙️ TTS audio generated, size:", audioBuffer.length);
+
+// Send text back into chat + attach audio link
+const avatarUrl = generateAvatarUri({
+  seed: existingAgent.name,
+  variant: "botttsNeutral",
+});
+
+streamChat.upsertUser({
+  id: existingAgent.id,
+  name: existingAgent.name,
+  image: avatarUrl,
+});
+
+// Text reply
+await channel.sendMessage({
+  text: GPTResponseText,
+  user: {
+    id: existingAgent.id,
+    name: existingAgent.name,
+    image: avatarUrl,
+  },
+});
+
+// (Optional) If you want to actually send audio to the call participants,
+// you can upload `audioBuffer` to storage (S3, Supabase, etc.) 
+// and include its URL in the chat message or directly inject into streamVideo call.
+
 
       if(!GPTResponseText){
 
@@ -281,10 +339,7 @@ await inngest.send({
         );
       }
 
-      const avatarUrl = generateAvatarUri({
- seed: existingAgent.name,
- variant: "botttsNeutral",
-      });
+     
 
       streamChat.upsertUser({
         id: existingAgent.id,
