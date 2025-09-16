@@ -3,12 +3,12 @@
 import { ErrorState } from "@/components/error-state";
 import { LoadingState } from "@/components/loading-state";
 import { useTRPC } from "@/trpc/client";
-import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import {   useSuspenseQuery } from "@tanstack/react-query";
 import { MeetingIdViewHeader } from "../components/meeting-id-view-header";
-import { useRouter } from "next/navigation";
+
 import { UpcomingState } from "../components/upcoming-state";
 import { ActiveState } from "../components/active-state";
-import { Cancel } from "@radix-ui/react-alert-dialog";
+
 import { CancelledState } from "../components/cancelled-state";
 import { ProcessingState } from "../components/processing-state";
 import { CompletedState } from "../components/completed-state";
@@ -20,8 +20,7 @@ interface Props{
 
 export const MeetingIdView = ({meetingId} : Props) => {
     const trpc = useTRPC();
-    const router= useRouter();
-    const queryClient= useQueryClient();
+
 
 
 
@@ -30,22 +29,7 @@ export const MeetingIdView = ({meetingId} : Props) => {
     );
 
 
-    const removeMeeting = useMutation(
-        trpc.meetings.remove.mutationOptions({
-            onSuccess: async() =>{
-                await queryClient.invalidateQueries(trpc.meetings.getMany.queryOptions({}));
-                   await  queryClient.invalidateQueries(
-                    trpc.premium.getFreeUsage.queryOptions(),
-                );
 
-
-
-                router.push("/meetings");
-            },
-            onError: () =>{}
-        })
-
-    )
 
     const isActive = data.status ==="active";
     const isUpcoming = data.status ==="upcoming";
@@ -76,8 +60,7 @@ return(
       data={data}/>}
       {isUpcoming && <UpcomingState
       meetingId={meetingId}
-      onCancelMeeting={() => {}}
-      isCancelling={false}
+
       />}
       {isActive && <ActiveState meetingId={meetingId} />}
 

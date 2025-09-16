@@ -1,4 +1,4 @@
-import { LoadingState } from "@/components/loading-state";
+
 import { AgentsView, AgentsViewError, AgentsViewLoading } from "@/modules/agents/ui/views/agents-views";
 import { getQueryClient, trpc } from "@/trpc/server";
 import {ErrorBoundary} from "react-error-boundary";

@@ -1,5 +1,5 @@
 import { ResponsiveDialog } from "@/components/responsive-dialog";
-import { PgBooleanBuilderInitial } from "drizzle-orm/pg-core";
+
 import { useRouter } from "next/navigation";
 import { MeetingForm } from "./meeting-form";
 

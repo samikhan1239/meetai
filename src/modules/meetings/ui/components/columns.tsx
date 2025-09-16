@@ -1,10 +1,9 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import humanizeDuration from "humanize-duration"
 import{format} from "date-fns"
 import { GeneratedAvatar } from "@/components/generated-avatar"
-import { CircleCheckIcon, CircleXIcon, ClockArrowUpIcon, ClockFadingIcon, CornerDownRightIcon, CornerRightDownIcon, LoaderIcon, VideoIcon } from "lucide-react"
+import { CircleCheckIcon, CircleXIcon, ClockArrowUpIcon, ClockFadingIcon, CornerDownRightIcon,  LoaderIcon, } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { MeetingGetMany } from "../../type"
 import { cn, formatDuration } from "@/lib/utils"

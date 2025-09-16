@@ -153,12 +153,7 @@ className="flex items-center gap-x-2 [&>svg]:size-4">
             <strong className="font-semibold" {...props} />
         ),
 
-        code: (props) => (
-            <code 
-            className="bg-gray-100 px-1 py-0.5 rounded"
-            
-            />
-        ),
+     
 
         blockquote: (props) => (
             <blockquote 

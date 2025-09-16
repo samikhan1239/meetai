@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import {  agents, meetings, user } from "@/db/schema";
 import JSONL from "jsonl-parse-stringify"
-import {createTRPCRouter, baseProcedure, protectedProcedure, premiumProcedure} from "@/trpc/init";
+import {createTRPCRouter,  protectedProcedure, premiumProcedure} from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
 
 import z from "zod";

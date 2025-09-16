@@ -1,5 +1,4 @@
 import { ResponsiveDialog } from "@/components/responsive-dialog";
-import { PgBooleanBuilderInitial } from "drizzle-orm/pg-core";
 import { AgentForm } from "./agent-form";
 
 interface NewAgentDialogProps{

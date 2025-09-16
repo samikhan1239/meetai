@@ -1,9 +1,9 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { AgentGetMany, AgentGetOne } from "../../types"
+import { AgentGetMany } from "../../types"
 import { GeneratedAvatar } from "@/components/generated-avatar"
-import { CornerDownRightIcon, CornerRightDownIcon, VideoIcon } from "lucide-react"
+import { CornerDownRightIcon, VideoIcon } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
 // This type is used to define the shape of our data.

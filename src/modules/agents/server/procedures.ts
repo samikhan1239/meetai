@@ -1,10 +1,10 @@
 import { db } from "@/db";
-import { agents } from "@/db/schema";
-import {createTRPCRouter, baseProcedure, protectedProcedure, premiumProcedure} from "@/trpc/init";
+import { agents, meetings } from "@/db/schema";
+import {createTRPCRouter, protectedProcedure, premiumProcedure} from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
 import { agentsInsertSchema, agentsUpdateSchema } from "../schemas";
 import z from "zod";
-import { and, count, desc, eq, getTableColumns, ilike, sql } from "drizzle-orm";
+import { and, count, desc, eq, getTableColumns, ilike } from "drizzle-orm";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE, MIN_PAGE_SIZE } from "@/constants";
 
 export const agentsRouter = createTRPCRouter({
@@ -60,8 +60,8 @@ export const agentsRouter = createTRPCRouter({
     getOne: protectedProcedure.input(z.object({id : z.string()})).query(async ({input,ctx}) =>{
         const [existingAgent]= await db
         .select({
-            meetingCount: sql<number>`5`,
-            ...getTableColumns(agents),
+               ...getTableColumns(agents),
+          meetingCount: db.$count(meetings, eq(agents.id, meetings.agentId))
           
         })
         .from(agents)
@@ -99,7 +99,7 @@ getMany: protectedProcedure
     const {search , page, pageSize} = input;
         const data = await db
         .select({
-            meetingCount: sql<number>`5`,
+              meetingCount: db.$count(meetings, eq(agents.id, meetings.agentId)),
             ...getTableColumns(agents),
           
         })
@@ -134,18 +134,27 @@ getMany: protectedProcedure
         };
 
     }),
+    create: premiumProcedure("agents")
+  .input(agentsInsertSchema)
+  .mutation(async ({ input, ctx }) => {
+    const [createdAgent] = await db
+      .insert(agents)
+      .values({
+        ...input,
+        userId: ctx.auth.user.id,
+      })
+      .returning();
 
-    create : premiumProcedure("agents")
-    .input(agentsInsertSchema)
-    .mutation(async ({ input, ctx}) => {
+    if (!createdAgent) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to create agent",
+      });
+    }
 
-        const [createdAgent] = await db
-        .insert(agents)
-        .values({
-            ...input,
-            userId: ctx.auth.user.id,
-        })
-        .returning();
+    return createdAgent;
+  }),
 
-    })
+
+ 
 })

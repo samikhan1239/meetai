@@ -1,9 +1,6 @@
 import {nanoid} from "nanoid";
-import { escapeIdentifier } from "@neondatabase/serverless";
-import { de, te } from "date-fns/locale";
 import { pgTable , text, timestamp, boolean, pgEnum } from "drizzle-orm/pg-core";
-import { access } from "fs";
-import { userAgent } from "next/server";
+
 
 export const user = pgTable("user", {
     id: text("id").primaryKey(),

@@ -11,9 +11,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 
-interface Props {
-    agentId : string;
-};
+
 
 export const AgentIdView = ({ agentId }: { agentId: string }) => {
     const router = useRouter();
